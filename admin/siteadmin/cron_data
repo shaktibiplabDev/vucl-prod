@@ -1,0 +1,11 @@
+<?php
+require_once realpath(__DIR__ . '/../../config/database.php');
+
+// Get all cron jobs data for AJAX requests
+$query = "SELECT * FROM cron_jobs ORDER BY last_run DESC";
+$stmt = $pdo->prepare($query);
+$stmt->execute();
+$cronJobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+header('Content-Type: application/json');
+echo json_encode($cronJobs);
