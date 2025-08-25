@@ -528,7 +528,7 @@ ALTER TABLE `site_settings`
 
 ALTER TABLE `transactions`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user`);
+  ADD KEY `user_id` (`user_id`);
 
 ALTER TABLE `transactions_list`
   ADD PRIMARY KEY (`id`),
