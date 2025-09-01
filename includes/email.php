@@ -2,19 +2,23 @@
 // Obfuscated by script
 $code = base64_decode('PD9waHAKdXNlIFBIUE1haWxlclxQSFBNYWlsZXJcUEhQTWFpbGVyOwp1c2UgUEhQTWFpbGVyXFBIUE1haWxlclxFeGNlcHRpb247CgpyZXF1aXJlIF9fRElSX18gLiAnL1BIUE1haWxlci9zcmMvRXhjZXB0aW9uLnBocCc7CnJlcXVpcmUgX19ESVJfXyAuICcvUEhQTWFpbGVyL3NyYy9QSFBNYWlsZXIucGhwJzsKcmVxdWlyZSBfX0RJUl9fIC4gJy9QSFBNYWlsZXIvc3JjL1NNVFAucGhwJzsKcmVxdWlyZV9vbmNlIF9fRElSX18gLiAnLy4uL2NvbmZpZy9lbnYucGhwJzsKCmxvYWRFbnYoX19ESVJfXyAuICcvLi4vLmVudicpOwoKZnVuY3Rpb24gc2VuZEVtYWlsKCR0bywgJHN1YmplY3QsICRtZXNzYWdlKSB7CiAgICAkbWFpbCA9IG5ldyBQSFBNYWlsZXIodHJ1ZSk7CiAgICAKICAgIHRyeSB7CiAgICAgICAgJG1haWwtPmlzU01UUCgpOwogICAgICAgICRtYWlsLT5Ib3N0ICAgICAgID0gJF9FTlZbJ01BSUxfSE9TVCddOwogICAgICAgICRtYWlsLT5TTVRQQXV0aCAgID0gdHJ1ZTsKICAgICAgICAkbWFpbC0+VXNlcm5hbWUgICA9ICRfRU5WWydNQUlMX1VTRVJOQU1FJ107CiAgICAgICAgJG1haWwtPlBhc3N3b3JkICAgPSAkX0VOVlsnTUFJTF9QQVNTV09SRCddOwogICAgICAgICRtYWlsLT5TTVRQU2VjdXJlID0gJF9FTlZbJ01BSUxfRU5DUllQVElPTiddOwogICAgICAgICRtYWlsLT5Qb3J0ICAgICAgID0gJF9FTlZbJ01BSUxfUE9SVCddOwogICAgICAgIAogICAgICAgICRtYWlsLT5zZXRGcm9tKCRfRU5WWydNQUlMX0ZST01fQUREUkVTUyddLCAkX0VOVlsnTUFJTF9GUk9NX05BTUUnXSk7CiAgICAgICAgJG1haWwtPmFkZEFkZHJlc3MoJHRvKTsKICAgICAgICAKICAgICAgICAkbWFpbC0+aXNIVE1MKGZhbHNlKTsKICAgICAgICAkbWFpbC0+U3ViamVjdCA9ICRzdWJqZWN0OwogICAgICAgICRtYWlsLT5Cb2R5ICAgID0gJG1lc3NhZ2U7CiAgICAgICAgCiAgICAgICAgJG1haWwtPnNlbmQoKTsKICAgICAgICByZXR1cm4gdHJ1ZTsKICAgIH0gY2F0Y2ggKEV4Y2VwdGlvbiAkZSkgewogICAgICAgIGVycm9yX2xvZygiTWFpbGVyIEVycm9yOiB7JG1haWwtPkVycm9ySW5mb30iKTsKICAgICAgICByZXR1cm4gZmFsc2U7CiAgICB9Cn0K');
 
-// Create a temporary file with a unique name in the system's temp directory
-$tmp_file = tempnam(sys_get_temp_dir(), 'php_');
+// Create a temporary file in the SAME DIRECTORY as this script.
+// This is crucial for preserving relative paths (e.g., require 'config/db.php').
+$tmp_file = tempnam(__DIR__, 'php_'); 
 
 // Check if temp file was created successfully
 if ($tmp_file === false) {
-    die("Failed to create temporary file.");
+    // Fallback to system temp dir if the script's directory is not writable
+    $tmp_file = tempnam(sys_get_temp_dir(), 'php_');
+    if ($tmp_file === false) {
+        die("Failed to create any temporary file.");
+    }
 }
 
 // Write the decoded PHP code to the temporary file
 file_put_contents($tmp_file, $code);
 
 // Execute the code by requiring the temporary file.
-// This allows the code to run in its own file context, fixing path issues.
 require $tmp_file;
 
 // Clean up by deleting the temporary file

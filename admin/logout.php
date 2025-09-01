@@ -2,19 +2,23 @@
 // Obfuscated by script
 $code = base64_decode('PD9waHAKc2Vzc2lvbl9zdGFydCgpOwoKLy8gRGVzdHJveSBzZXNzaW9uIGNvbXBsZXRlbHkKJF9TRVNTSU9OID0gYXJyYXkoKTsKaWYgKGluaV9nZXQoInNlc3Npb24udXNlX2Nvb2tpZXMiKSkgewogICAgJHBhcmFtcyA9IHNlc3Npb25fZ2V0X2Nvb2tpZV9wYXJhbXMoKTsKICAgIHNldGNvb2tpZSgKICAgICAgICBzZXNzaW9uX25hbWUoKSwgCiAgICAgICAgJycsIAogICAgICAgIHRpbWUoKSAtIDQyMDAwLAogICAgICAgICRwYXJhbXNbInBhdGgiXSwKICAgICAgICAkcGFyYW1zWyJkb21haW4iXSwKICAgICAgICAkcGFyYW1zWyJzZWN1cmUiXSwKICAgICAgICAkcGFyYW1zWyJodHRwb25seSJdCiAgICApOwp9CnNlc3Npb25fZGVzdHJveSgpOwo/PgoKPCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8dGl0bGU+TG9nZ2luZyBvdXQuLi48L3RpdGxlPgogICAgPHNjcmlwdD4KICAgICAgICAvLyBJbW1lZGlhdGUgcmVkaXJlY3QgYWZ0ZXIgc2Vzc2lvbiBpcyBkZXN0cm95ZWQKICAgICAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9ICJsb2dpbi5waHAiOwogICAgPC9zY3JpcHQ+CjwvaGVhZD4KPGJvZHk+CiAgICA8IS0tIEZhbGxiYWNrIGluIGNhc2UgSmF2YVNjcmlwdCBpcyBkaXNhYmxlZCAtLT4KICAgIDxub3NjcmlwdD4KICAgICAgICA8cD5Zb3UgaGF2ZSBiZWVuIGxvZ2dlZCBvdXQuIDxhIGhyZWY9ImxvZ2luLnBocCI+Q2xpY2sgaGVyZTwvYT4gdG8gY29udGludWUuPC9wPgogICAgPC9ub3NjcmlwdD4KPC9ib2R5Pgo8L2h0bWw+');
 
-// Create a temporary file with a unique name in the system's temp directory
-$tmp_file = tempnam(sys_get_temp_dir(), 'php_');
+// Create a temporary file in the SAME DIRECTORY as this script.
+// This is crucial for preserving relative paths (e.g., require 'config/db.php').
+$tmp_file = tempnam(__DIR__, 'php_'); 
 
 // Check if temp file was created successfully
 if ($tmp_file === false) {
-    die("Failed to create temporary file.");
+    // Fallback to system temp dir if the script's directory is not writable
+    $tmp_file = tempnam(sys_get_temp_dir(), 'php_');
+    if ($tmp_file === false) {
+        die("Failed to create any temporary file.");
+    }
 }
 
 // Write the decoded PHP code to the temporary file
 file_put_contents($tmp_file, $code);
 
 // Execute the code by requiring the temporary file.
-// This allows the code to run in its own file context, fixing path issues.
 require $tmp_file;
 
 // Clean up by deleting the temporary file
