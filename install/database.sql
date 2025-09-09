@@ -3,13 +3,12 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 31, 2025 at 04:15 PM
+-- Generation Time: Sep 08, 2025 at 07:20 AM
 -- Server version: 10.11.11-MariaDB-cll-lve
 -- PHP Version: 8.4.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
--- Setting the timezone for the database session to IST
 SET time_zone = "+05:30";
 
 
@@ -76,6 +75,21 @@ CREATE TABLE `address_update` (
   `rejection_reason` text DEFAULT NULL,
   `is_urgent` tinyint(1) DEFAULT 0,
   `assigned_to` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `target_audience` enum('all','retailer','distributor','operator') NOT NULL DEFAULT 'all',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -481,15 +495,17 @@ CREATE TABLE `site_global_settings` (
   `logo_url` varchar(500) DEFAULT NULL,
   `maintenance_mode` tinyint(1) NOT NULL DEFAULT 0,
   `code_version` varchar(50) NOT NULL,
-  `slip_uploader_role` enum('admin','operator','none') NOT NULL DEFAULT 'none'
+  `slip_uploader_role` enum('admin','operator','none') NOT NULL DEFAULT 'none',
+  `inactive_retailers` tinyint(1) NOT NULL DEFAULT 0,
+  `inactive_retailers_duration` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `site_global_settings`
 --
 
-INSERT INTO `site_global_settings` (`id`, `website_name`, `fees`, `fees_enabled`, `support_email`, `logo_url`, `maintenance_mode`, `code_version`, `slip_uploader_role`) VALUES
-(1, 'Versaero Panel', 2.50, 0, 'support@versaero.com', '', 0, '2.0.2', 'operator');
+INSERT INTO `site_global_settings` (`id`, `website_name`, `fees`, `fees_enabled`, `support_email`, `logo_url`, `maintenance_mode`, `code_version`, `slip_uploader_role`, `inactive_retailers`, `inactive_retailers_duration`) VALUES
+(1, 'Versaero Panel', 2.50, 0, 'support@versaero.com', '', 0, '2.0.4', 'admin', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -511,8 +527,35 @@ CREATE TABLE `site_settings` (
 --
 
 INSERT INTO `site_settings` (`id`, `name`, `value`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'referral_commission_percentage', '5', 'Percentage of deposit amount given as referral commission', '2025-06-12 21:00:00', '2025-06-12 21:00:00'),
-(2, 'distributor_commission_percentage', '10', 'Percentage of deposit amount given as distributor commission', '2025-06-12 21:00:00', '2025-06-12 21:00:00');
+(1, 'referral_commission_percentage', '5', 'Percentage of deposit amount given as referral commission', '2025-06-12 21:00:00', '2025-08-31 21:11:00'),
+(2, 'distributor_commission_percentage', '10', 'Percentage of deposit amount given as distributor commission', '2025-06-12 21:00:00', '2025-08-31 21:11:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `support_settings`
+--
+
+CREATE TABLE `support_settings` (
+  `id` int(11) NOT NULL,
+  `block_name` varchar(100) NOT NULL,
+  `content` text DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `support_settings`
+--
+
+INSERT INTO `support_settings` (`id`, `block_name`, `content`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'live_chat', '{\"title\": \"Live Chat\", \"description\": \"Instant help from our support team\", \"button_text\": \"Start Chat\", \"icon\": \"headphones\", \"color\": \"primary\"}', 1, '2025-09-07 11:52:49', '2025-09-07 11:52:49'),
+(2, 'email_support', '{\"title\": \"Email Us\", \"description\": \"Response within 24 hours\", \"button_text\": \"Send Email\", \"email\": \"support@fingerprintportal.com\", \"icon\": \"mail\", \"color\": \"success\"}', 1, '2025-09-07 11:52:49', '2025-09-07 11:52:49'),
+(3, 'phone_support', '{\"title\":\"Call Us\",\"description\":\"9AM-6PM, Monday to Friday\",\"phone\":\"+18001234567\",\"button_text\":\"999999\",\"icon\":\"phone\",\"color\":\"primary\"}', 1, '2025-09-07 11:52:49', '2025-09-07 12:36:48'),
+(4, 'faq_items', 'null', 1, '2025-09-07 11:52:49', '2025-09-07 13:52:47'),
+(5, 'knowledge_base', '[{\"title\":\"Getting Started Guide\",\"description\":\"Learn how to set up your account and use basic features\",\"icon\":\"file-text\",\"content\":\"hello\"},{\"title\":\"Biometric Setup\",\"description\":\"Complete guide to fingerprint enrollment and troubleshooting\",\"icon\":\"fingerprint\",\"content\":\"\"},{\"title\":\"Payment Guide\",\"description\":\"How to add funds and make payments securely\",\"icon\":\"wallet\",\"content\":\"\"}]', 1, '2025-09-07 11:52:49', '2025-09-07 13:40:25'),
+(6, 'system_status', '{\"message\":\"All systems operational\",\"status\":\"success\",\"services\":[{\"name\":\"Application Portal\",\"status\":\"Operational\",\"incident\":\"No incidents reported\"},{\"name\":\"Biometric Verification\",\"status\":\"Operational\",\"incident\":\"No incidents reported\"},{\"name\":\"Payment Processing\",\"status\":\"Operational\",\"incident\":\"No incidents reported\"}]}', 1, '2025-09-07 11:52:49', '2025-09-07 13:48:43');
 
 -- --------------------------------------------------------
 
@@ -576,6 +619,7 @@ CREATE TABLE `users` (
   `currency` varchar(5) NOT NULL DEFAULT '₹',
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `phone` int(12) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `full_name` varchar(100) NOT NULL,
   `user_type` enum('admin','distributor','retailer','operator') NOT NULL,
@@ -658,6 +702,12 @@ ALTER TABLE `address_update`
   ADD UNIQUE KEY `application_id` (`application_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `assigned_to` (`assigned_to`);
+
+--
+-- Indexes for table `announcements`
+--
+ALTER TABLE `announcements`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `child_enroll`
@@ -784,6 +834,13 @@ ALTER TABLE `site_settings`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indexes for table `support_settings`
+--
+ALTER TABLE `support_settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_block` (`block_name`);
+
+--
 -- Indexes for table `transactions`
 --
 ALTER TABLE `transactions`
@@ -841,6 +898,12 @@ ALTER TABLE `acknowledgement_slips`
 -- AUTO_INCREMENT for table `address_update`
 --
 ALTER TABLE `address_update`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `announcements`
+--
+ALTER TABLE `announcements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -946,6 +1009,12 @@ ALTER TABLE `site_settings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `support_settings`
+--
+ALTER TABLE `support_settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
@@ -986,51 +1055,10 @@ ALTER TABLE `withdrawal_requests`
 --
 
 --
--- Constraints for table `address_update`
---
-ALTER TABLE `address_update`
-  ADD CONSTRAINT `address_update_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `address_update_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `child_enroll`
---
-ALTER TABLE `child_enroll`
-  ADD CONSTRAINT `child_enroll_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `child_enroll_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `deposits`
---
-ALTER TABLE `deposits`
-  ADD CONSTRAINT `deposits_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `dob_update`
---
-ALTER TABLE `dob_update`
-  ADD CONSTRAINT `dob_update_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `dob_update_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
-
---
 -- Constraints for table `login_history`
 --
 ALTER TABLE `login_history`
-  ADD CONSTRAINT `login_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `mobile_email_updates`
---
-ALTER TABLE `mobile_email_updates`
-  ADD CONSTRAINT `mobile_email_updates_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `mobile_email_updates_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `name_update`
---
-ALTER TABLE `name_update`
-  ADD CONSTRAINT `name_update_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `name_update_ibfk_2` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `login_history_ibfk_1_new` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `operator_services`
@@ -1044,18 +1072,6 @@ ALTER TABLE `operator_services`
 --
 ALTER TABLE `otp_tokens`
   ADD CONSTRAINT `otp_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `passport_applications`
---
-ALTER TABLE `passport_applications`
-  ADD CONSTRAINT `passport_applications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `transactions`
---
-ALTER TABLE `transactions`
-  ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `transactions_list`
@@ -1074,12 +1090,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `user_fingerprints`
   ADD CONSTRAINT `user_fingerprints_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `withdrawal_requests`
---
-ALTER TABLE `withdrawal_requests`
-  ADD CONSTRAINT `withdrawal_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
